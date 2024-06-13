@@ -1,3 +1,4 @@
+import 'package:chatapp/pages/chat_page.dart';
 import 'package:chatapp/pages/login_page.dart';
 import 'package:chatapp/pages/register_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,8 +23,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {/// to connect the string with it's value
-        "LogInPage" : (context) => LogInPage(),
+        LogInPage.id : (context) => LogInPage(),
         RegisterScreen.id : (context) => RegisterScreen(),
+        ChatPage.id : (context) => ChatPage()
       },
       title: 'Flutter Demo',
       theme: ThemeData(
