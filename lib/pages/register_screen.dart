@@ -33,7 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return ModalProgressHUD(
       inAsyncCall: isLoading,
       child: Scaffold(
-        backgroundColor: KPrimaryColor,
+        backgroundColor: Colors.white,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Form(
@@ -43,21 +43,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Column(
                   children: [
                     SizedBox(
-                      height: 80,
-                    ),
-                    Image.asset(
-                      'assets/images/scholar.png',
-                      height: 100,
+                      height: 170,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Scolar Chat',
+                          'Chat App',
                           style: TextStyle(
                               fontSize: 32,
-                              color: Colors.white,
-                              fontFamily: "Pacifico"),
+                              color: KPrimaryColor,
+                              fontFamily: "Pacifico"
+                          ),
                         ),
                       ],
                     ),
@@ -72,7 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           textAlign: TextAlign.start,
                           style: TextStyle(
                             fontSize: 24,
-                            color: Colors.white,
+                            color: KPrimaryColor,
                           ),
                         ),
                       ],
@@ -90,7 +87,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       height: 20,
                     ),
                     CustomTextField(
-                      onChanged: (data){
+                        obscureText: true,
+                        onChanged: (data){
                         password = data;
                       },
                         hintText: 'Password'
@@ -107,17 +105,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           });
                           try{
                             await registerMethod();
-                            showSnakPar(context,'Success');
+                            showSnackPar(context,'Success');
                             Navigator.pushNamed(context, ChatPage.id);
                           }on FirebaseAuthException catch(e){
                             if(e.code == 'weak-password'){
-                              showSnakPar(context,'weak password');
+                              showSnackPar(context,'weak password');
                             }else if(e.code == 'email-already-in-use'){
-                              showSnakPar(context,'email already exists');
+                              showSnackPar(context,'email already exists');
                             }
                           }catch(e){
                             //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-                            showSnakPar(context,'there was an error');
+                            showSnackPar(context,'there was an error');
                           }
                           isLoading = false;
                           setState(() {
@@ -137,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           textAlign: TextAlign.start,
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                         ),
                         SizedBox(
@@ -145,11 +143,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            // Navigator.push(context,
-                            // MaterialPageRoute(builder: (context){
-                            //   return LogInPage();
-                            // })
-                            // );
                             Navigator.pop(context);
                           },
                           child: Text(
@@ -157,7 +150,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             textAlign: TextAlign.start,
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.white,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold
                             ),
                           ),
                         ),
@@ -173,7 +167,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void showSnakPar(BuildContext context,String message) {
+  void showSnackPar(BuildContext context,String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 

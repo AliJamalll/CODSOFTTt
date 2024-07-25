@@ -1,64 +1,84 @@
 import 'package:chatapp/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../model/message_model.dart';
 import '../widgets/chat_bubble.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
    ChatPage({super.key});
-  //FirebaseFirestore firestore = FirebaseFirestore.instance;
-   CollectionReference messages = FirebaseFirestore.instance.collection(KmessagesCollection);
-
-   TextEditingController controller = TextEditingController();
    static String id = 'ChatPage';
 
   @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+   CollectionReference messages = FirebaseFirestore.instance.collection(KmessagesCollection);
+
+   TextEditingController TextFeildcontroller = TextEditingController();
+
+   final _controller = ScrollController();
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<QuerySnapshot>(
-        future: messages.get(),
+    var email = ModalRoute.of(context)!.settings.arguments;
+    return StreamBuilder<QuerySnapshot>(
+        stream: messages.orderBy(
+          descending: true,
+            KCreatedAt
+        ).snapshots(),
         builder: (context,snapshot){
-        //  print(snapshot.data!['text']);
           if(snapshot.hasData){
-            print(snapshot.data!.docs[0]['text']);
+            List<Message> text = [];
+            for(int i = 0; i < snapshot.data!.docs.length;i++){
+              text.add(Message.fromJson(snapshot.data!.docs[i]));
+            }
             return Scaffold(
                 appBar: AppBar(
                   automaticallyImplyLeading: false,///to remove the back arrow
                   backgroundColor: KPrimaryColor,
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset("assets/images/scholar.png",
-                        height: 50,
-                      ),
+                  title:
                       Text(
-                        'Chat',
+                        'Chat App',
                         style: TextStyle(
                             fontSize: 25,
-                            color: Colors.white
+                            color: Colors.white,
+                            fontFamily: "Pacifico"
                         ),
                       ),
-                    ],
-                  ),
+
+
                   centerTitle: true,
                 ),
                 body: Column(
                   children:[
                     Expanded(
                       child: ListView.builder(
+                        reverse: true,
+                        controller: _controller,
+                        itemCount: text.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return  CustomChatBubble();
-
+                          return text[index].id == email ? CustomChatBubble(message: text[index],) :
+                          CustomChatBubble2(message: text[index]);
                         },
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: TextField(
-                        controller: controller,
+                        controller: TextFeildcontroller,
                         onSubmitted: (data){
                           messages.add({
-                            'text' : data,
+                            Kmessage : data,
+                            KCreatedAt : DateTime.now(),
+                            'id' : email
                           });
-                          controller.clear();
+                          TextFeildcontroller.clear();
+                          _controller.animateTo(
+                              0,
+                              duration: Duration(seconds: 1),
+                              curve: Curves.fastOutSlowIn
+                          );
                         },
                         decoration: InputDecoration(
                             hintText: 'Send message',
@@ -75,8 +95,14 @@ class ChatPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16),
                                 borderSide: BorderSide(
                                     color: KPrimaryColor
-                                )
-                            )
+                                ),
+                            ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide(
+                                color: KPrimaryColor
+                            ),
+                          )
                         ),
                       ),
                     ),
@@ -84,7 +110,7 @@ class ChatPage extends StatelessWidget {
                 )
             );
           }else{
-            return Text('Loasding');
+            return Text('Loading');
           }
         }
     );
